@@ -31,7 +31,7 @@ class PaginatorViewsTest(TestCase):
                 Post(text=f'Тестовый текст {i}',
                      group=cls.group,
                      author=cls.user)
-        )
+            )
         Post.objects.bulk_create(gen_posts_list)
         cls.pages = [
             reverse('posts:main'),
