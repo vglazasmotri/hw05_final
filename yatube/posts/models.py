@@ -14,6 +14,7 @@ class Group(models.Model):
     def __str__(self):
         return self.title
 
+
 class Post(models.Model):
     text = models.TextField(
         verbose_name='Текст поста',
@@ -49,6 +50,7 @@ class Post(models.Model):
     def __str__(self):
         return self.text[:CHAR_MAX]
 
+
 class Comment(models.Model):
     text = models.TextField(
         verbose_name='Текст комментария',
@@ -74,6 +76,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
 
 class Follow(models.Model):
     user = models.ForeignKey(
