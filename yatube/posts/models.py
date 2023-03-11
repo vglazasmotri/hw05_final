@@ -54,6 +54,7 @@ class Post(models.Model):
 class Comment(models.Model):
     text = models.TextField(
         verbose_name='Текст комментария',
+        help_text='Напишите комментарий',
     )
     created = models.DateTimeField(
         verbose_name='Дата и время публикации',
@@ -75,7 +76,7 @@ class Comment(models.Model):
         ordering = ['-created']
 
     def __str__(self):
-        return self.text
+        return self.text[:CHAR_MAX]
 
 
 class Follow(models.Model):
@@ -93,3 +94,12 @@ class Follow(models.Model):
     class Meta:
         ordering = ['-author']
         verbose_name = 'Подписки на авторов'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'], name='unique_follow'
+            ),
+            models.CheckConstraint(
+                check=~models.Q(author=models.F('user')),
+                name='can_not_follow_yourself'
+            ),
+        ]

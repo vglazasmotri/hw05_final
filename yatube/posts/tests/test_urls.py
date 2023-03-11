@@ -25,7 +25,9 @@ class CorrectURLTests(TestCase):
         self.post_create_url = '/create/'
         self.post_edit_url = f'/posts/{self.post.id}/edit/'
         self.guest_redirect_post_create_url = '/auth/login/?next=/create/'
-        self.guest_redirect_post_edit_url = self.post_detail_url
+        self.guest_redirect_post_edit_url = (
+            f'/auth/login/?next=/posts/{self.post.id}/edit/')
+        self.follow_index_url = '/follow/'
         self.unexisting_page_url = '/unexisting_page/'
 
     def test_urls_uses_correct_template(self):
@@ -37,6 +39,8 @@ class CorrectURLTests(TestCase):
             self.post_detail_url: 'posts/post_detail.html',
             self.post_create_url: 'posts/create_post.html',
             self.post_edit_url: 'posts/create_post.html',
+            self.follow_index_url: 'posts/follow.html',
+
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
@@ -80,4 +84,4 @@ class CorrectURLTests(TestCase):
     def test_unexisting_page(self):
         """Код несуществующей страницы 404"""
         response = self.guest_client.get(self.unexisting_page_url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)

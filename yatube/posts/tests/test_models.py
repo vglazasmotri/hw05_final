@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from ..models import Group, Post, CHAR_MAX
+from ..models import Group, Comment, Post, CHAR_MAX
 
 User = get_user_model()
 
@@ -53,3 +53,40 @@ class PostModelTest(TestCase):
                 self.assertEqual(
                     self.post._meta.get_field(field).verbose_name,
                     expected_value, error_name)
+
+class CommentModelTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='auth')
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовый пост',
+        )
+        cls.comment = Comment.objects.create(
+            author=cls.user,
+            text='Тестовый комментарий',
+            post=cls.post,
+        )
+
+    def test_comments(self):
+        """Проверяем, что у модели comments корректно работает __str__."""
+        self.assertEqual(str(self.comment), self.comment.text[:CHAR_MAX])
+        
+    def test_title_help_text(self):
+        """Проверка заполнения help_text у модели comments"""
+        self.assertEqual(
+            self.comment._meta.get_field('text').help_text,
+            'Напишите комментарий')
+
+    def test_title_label(self):
+        """Проверка заполнения verbose_name у модели comments"""
+        field_verboses = {'text': 'Текст комментария',
+                          'created': 'Дата и время публикации',
+                          'post': 'Пост',
+                          'author': 'Автор'}
+        for field, expected_value in field_verboses.items():
+            with self.subTest(field=field):
+                self.assertEqual(
+                    self.comment._meta.get_field(field).verbose_name,
+                    expected_value)

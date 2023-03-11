@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from ..models import Group, Post
+from ..models import Group, Comment, Post
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 User = get_user_model()
@@ -92,3 +92,34 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(post.group, new_group)
         self.assertEqual(post.author, self.user)
         self.assertFalse(self.group.posts.count())
+
+class CommentCreateFormTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='auth')
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовый пост',
+        )
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
+    def test_create_post(self):
+        """Форма создает новый комментарий."""
+        form_data = {'text': 'Тестовый комментарий',}
+        comments_count = Comment.objects.count()
+        response = self.authorized_client.post(
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=True,
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(Comment.objects.count(), comments_count + ADDED_POSTS)
+        comment = Comment.objects.last()
+        self.assertEqual(comment.text, form_data['text'])
+        self.assertEqual(comment.post, self.post)
+        self.assertEqual(comment.author, self.user)
