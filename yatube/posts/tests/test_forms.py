@@ -93,6 +93,7 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(post.author, self.user)
         self.assertFalse(self.group.posts.count())
 
+
 class CommentCreateFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -110,7 +111,7 @@ class CommentCreateFormTests(TestCase):
 
     def test_create_post(self):
         """Форма создает новый комментарий."""
-        form_data = {'text': 'Тестовый комментарий',}
+        form_data = {'text': 'Тестовый комментарий', }
         comments_count = Comment.objects.count()
         response = self.authorized_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),

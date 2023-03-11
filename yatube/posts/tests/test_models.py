@@ -54,6 +54,7 @@ class PostModelTest(TestCase):
                     self.post._meta.get_field(field).verbose_name,
                     expected_value, error_name)
 
+
 class CommentModelTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -72,7 +73,7 @@ class CommentModelTest(TestCase):
     def test_comments(self):
         """Проверяем, что у модели comments корректно работает __str__."""
         self.assertEqual(str(self.comment), self.comment.text[:CHAR_MAX])
-        
+
     def test_title_help_text(self):
         """Проверка заполнения help_text у модели comments"""
         self.assertEqual(
